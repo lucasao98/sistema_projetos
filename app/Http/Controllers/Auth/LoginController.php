@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -37,6 +40,26 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    public function login(Request $request){
+        $data = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
+
+        if(Auth::attempt($data)){
+            Session::put('isadmin',$request->superuser);
+
+            if(Session::get('isadmin') == 0){
+                return redirect()->route('site.admin');
+            }
+            else{
+                return redirect()->route('site.user');
+            }
+        }else{
+            return redirect()->route('home');
+        }
+    }
+
     public function logout(Request $request){
         Auth::logout();
 
@@ -44,6 +67,6 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('home');
     }
 }
