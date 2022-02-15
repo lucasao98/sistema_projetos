@@ -29,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    //protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -40,33 +40,4 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function login(Request $request){
-        $data = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
-
-        if(Auth::attempt($data)){
-            Session::put('isadmin',$request->superuser);
-
-            if(Session::get('isadmin') == 0){
-                return redirect()->route('site.admin');
-            }
-            else{
-                return redirect()->route('site.user');
-            }
-        }else{
-            return redirect()->route('home');
-        }
-    }
-
-    public function logout(Request $request){
-        Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home');
-    }
 }
