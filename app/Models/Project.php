@@ -8,9 +8,7 @@ use App\Models\User;
 
 class Project extends Model{
 
-    protected $table = 'projects';
-
     public function user(){
-        return $this->hasOne(User::class,'user_id','id');
+        return $this->belongsTo(User::class);
     }
 }

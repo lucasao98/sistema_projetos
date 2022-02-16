@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ProjectController extends Controller{
 
@@ -15,15 +16,13 @@ class ProjectController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $project = new Project();
+        return view('projects.table_projects',[
+            'projects' => Project::with('user')->get(),
+        ]);
+    }
 
-        $user = $project->user()->first();
-
-        dd($user);
-
-        // return view('table_projects',[
-        //     'projects' => Project::all()
-        // ]);
+    public function showForm(){
+        return view('projects.create_project');
     }
 
     /**
@@ -32,9 +31,21 @@ class ProjectController extends Controller{
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request){
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        var_dump(Session::get('email'));
+
+        // $project = new Project();
+        // $project->name = $request->name;
+        // $project->start_date = $request->start_date;
+        // $project->end_date = $request->end_date;
+        // $project->user_id =
+
     }
 
     /**
@@ -43,9 +54,8 @@ class ProjectController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function show($id){
+
     }
 
     /**
@@ -55,9 +65,8 @@ class ProjectController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        //
+    public function update(Request $request, $id){
+
     }
 
     /**
@@ -66,8 +75,11 @@ class ProjectController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
+    public function destroy($id){
+        $project = Project::find($id);
+
+        $project->delete();
+
+        return redirect()->route('table');
     }
 }

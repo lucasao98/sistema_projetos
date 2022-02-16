@@ -16,7 +16,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="" class="nav-link link-dark">
+                        <a href="{{ route('create.project')}}" class="nav-link link-dark">
                             <i class="fa-solid fa-plus"></i>
                           Add Project
                         </a>

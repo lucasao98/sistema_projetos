@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller{
     public function index(){
+        if(Auth::check() == true){
+            if(Session::get('isadmin') == 1){
+                return redirect()->route('admin');
+            }else{
+                return redirect()->route('user');
+            }
+        }
         return view('layouts.login');
     }
 
