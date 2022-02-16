@@ -28,6 +28,7 @@ class LoginController extends Controller{
 
         $user = User::where('email',$request->email)->first();
         Session::put('isadmin',$user['superuser']);
+        Session::put('id',$user['id']);
 
         if(Auth::attempt($data)){
             if(Session::get('isadmin') == 1){

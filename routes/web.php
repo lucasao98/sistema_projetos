@@ -32,3 +32,14 @@ Route::prefix(('project'))->group(function(){
     Route::post('create', [App\Http\Controllers\Site\ProjectController::class, 'store'])->name('store.project');
     Route::delete('delete/{id}', [App\Http\Controllers\Site\ProjectController::class, 'destroy'])->name('delete.project');
 });
+
+Route::prefix(('admin'))->group(function(){
+    Route::get('create/user', [App\Http\Controllers\Site\UserController::class, 'showForm'])->name('create.user');
+    Route::get('users', [App\Http\Controllers\Site\UserController::class, 'show'])->name('users');
+    Route::get('admins', [App\Http\Controllers\Site\AdminController::class, 'show'])->name('admins');
+    Route::get('create', [App\Http\Controllers\Site\AdminController::class, 'showForm'])->name('create.admin');
+    Route::post('create/user', [App\Http\Controllers\Site\UserController::class, 'store'])->name('store.user');
+    Route::post('create', [App\Http\Controllers\Site\AdminController::class, 'store'])->name('store.admin');
+    Route::delete('delete/user/{id}', [App\Http\Controllers\Site\UserController::class, 'destroy'])->name('delete.user');
+    Route::delete('delete/admin/{id}', [App\Http\Controllers\Site\AdminController::class, 'destroy'])->name('delete.admin');
+});

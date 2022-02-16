@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class ProjectController extends Controller{
@@ -33,18 +34,20 @@ class ProjectController extends Controller{
      */
     public function store(Request $request){
         $validated = $request->validate([
-            'name' => 'required|string|max:50',
+            'name' => 'required|string|max:50|unique:projects,name',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);
 
-        var_dump(Session::get('email'));
+        $project = new Project();
+        $project->name = $request->name;
+        $project->start_date = $request->start_date;
+        $project->end_date = $request->end_date;
+        $project->user_id = Session::get('id');
 
-        // $project = new Project();
-        // $project->name = $request->name;
-        // $project->start_date = $request->start_date;
-        // $project->end_date = $request->end_date;
-        // $project->user_id =
+        $project->save();
+
+        return redirect()->route('table');
 
     }
 

@@ -5,25 +5,23 @@
     <thead>
       <tr>
         <th scope="col">Name</th>
-        <th scope="col">Start_Date</th>
-        <th scope="col">End_Date</th>
-        <th scope="col">Project Owner</th>
+        <th scope="col">Email</th>
+        <th scope="col">Created_at</th>
         <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
-        @foreach($projects as $project)
+        @foreach($users as $user)
             <tr>
-                <td>{{$project->name}}</td>
-                <td>{{$project->start_date}}</td>
-                <td>{{$project->end_date}}</td>
-                <td>{{$project->user->name}}</td>
+                <td>{{$user->name}}</td>
+                <td>{{$user->email}}</td>
+                <td>{{$user->created_at}}</td>
                 <td>
                     <a class="btn btn-primary" href="http://">
-                        <i class="fa-solid fa-eye"></i>
+                        <i class="fa-solid fa-pen-to-square"></i>
                     </a>
                 </td>
-                <form action="{{ route('delete.project',$project->id)}}" method="post">
+                <form action="{{ route('delete.user',$user->id)}}" method="post">
                     @csrf
                     @method('delete')
                     <td><button class="btn btn-danger" type="submit"><i class="fa-regular fa-trash-can"></i></button></td>

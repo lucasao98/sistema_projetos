@@ -28,15 +28,27 @@
                         </a>
                       </li>
                       <li>
-                        <a href="#" class="nav-link link-dark">
+                        <a href="{{ route('create.user')}}" class="nav-link link-dark">
                           <i class="fa-solid fa-users"></i>
                           Add User
                         </a>
                       </li>
                       <li>
-                        <a href="#" class="nav-link link-dark">
+                        <a href="{{ route('users')}}" class="nav-link link-dark">
+                          <i class="fa-solid fa-address-book"></i>
+                          Users
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{{ route('create.admin')}}" class="nav-link link-dark">
                           <i class="fa-solid fa-user"></i>
                           Add Admin
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{{ route('admins')}}" class="nav-link link-dark">
+                          <i class="fa-solid fa-rectangle-list"></i>
+                          Admins
                         </a>
                       </li>
                     </ul>
