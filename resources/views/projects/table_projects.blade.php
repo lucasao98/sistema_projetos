@@ -19,10 +19,14 @@
                 <td>{{$project->end_date}}</td>
                 <td>{{$project->user->name}}</td>
                 <td>
-                    <a class="btn btn-primary" href="http://">
+                    <a class="btn btn-primary" href="{{ route('tasks',$project->id)}}">
                         <i class="fa-solid fa-eye"></i>
                     </a>
                 </td>
+                <form action="{{ route('show.project',$project->id)}}" method="get">
+                    @csrf
+                    <td><button class="btn btn-warning" type="submit"><i class="fa-solid fa-pen-to-square"></i></button></td>
+                </form>
                 <form action="{{ route('delete.project',$project->id)}}" method="post">
                     @csrf
                     @method('delete')

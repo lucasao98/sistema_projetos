@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +59,9 @@ class ProjectController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-
+        return view('projects.update_project',[
+            'project' => Project::find($id)
+        ]);
     }
 
     /**
@@ -69,9 +72,22 @@ class ProjectController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id){
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:projects,name',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        $project = Project::find($id);
+        $project->name = $request->name;
+        $project->start_date = $request->start_date;
+        $project->end_date = $request->end_date;
+
+        $project->save();
+
+        return redirect()->route('table');
 
     }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -84,5 +100,17 @@ class ProjectController extends Controller{
         $project->delete();
 
         return redirect()->route('table');
+    }
+
+    public function showTasks($id){
+        $project = Project::find($id);
+
+        Session::put('current_project_name',$project['name']);
+        Session::put('current_id',$project['name']);
+
+        return view('projects.show_project',[
+            'project' => $project['name'],
+            'tasks' =>Task::all()
+        ]);
     }
 }

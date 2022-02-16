@@ -28,7 +28,10 @@ Route::prefix('site')->group(function (){
 
 Route::prefix(('project'))->group(function(){
     Route::get('table', [App\Http\Controllers\Site\ProjectController::class, 'index'])->name('table');
+    Route::get('tasks/{id}', [App\Http\Controllers\Site\ProjectController::class, 'showTasks'])->name('tasks');
     Route::get('create', [App\Http\Controllers\Site\ProjectController::class, 'showForm'])->name('create.project');
+    Route::get('/show/{id}', [App\Http\Controllers\Site\ProjectController::class, 'show'])->name('show.project');
+    Route::put('/update/{id}', [App\Http\Controllers\Site\ProjectController::class, 'update'])->name('update.project');
     Route::post('create', [App\Http\Controllers\Site\ProjectController::class, 'store'])->name('store.project');
     Route::delete('delete/{id}', [App\Http\Controllers\Site\ProjectController::class, 'destroy'])->name('delete.project');
 });
@@ -42,4 +45,10 @@ Route::prefix(('admin'))->group(function(){
     Route::post('create', [App\Http\Controllers\Site\AdminController::class, 'store'])->name('store.admin');
     Route::delete('delete/user/{id}', [App\Http\Controllers\Site\UserController::class, 'destroy'])->name('delete.user');
     Route::delete('delete/admin/{id}', [App\Http\Controllers\Site\AdminController::class, 'destroy'])->name('delete.admin');
+});
+
+Route::prefix(('task'))->group(function(){
+    Route::get('task', [App\Http\Controllers\Site\TaskController::class, 'create'])->name('task');
+    Route::post('add/task', [App\Http\Controllers\Site\TaskController::class, 'store'])->name('create.task');
+    Route::delete('delete/task/{id}', [App\Http\Controllers\Site\TaskController::class, 'destroy'])->name('delete.task');
 });
