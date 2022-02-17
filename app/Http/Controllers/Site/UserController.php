@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,5 +75,17 @@ class UserController extends Controller{
         $user->delete();
 
         return redirect()->route('users');
+    }
+
+    public function showProjects($id){
+        if (Session::get('isadmin') == 0) {
+            return view('users.table_projects',[
+                Project::with('user')->where('project_id',$id)->get()
+            ]);
+        } elseif (Session::get('isadmin') == 1) {
+            return redirect()->route('admin');
+        } else {
+            return redirect()->route('login');
+        }
     }
 }

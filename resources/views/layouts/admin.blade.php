@@ -27,6 +27,7 @@
                           Projects
                         </a>
                       </li>
+                      @if (Session::get('isadmin') == 1)
                       <li>
                         <a href="{{ route('create.user')}}" class="nav-link link-dark">
                           <i class="fa-solid fa-users"></i>
@@ -51,6 +52,8 @@
                           Admins
                         </a>
                       </li>
+                    @endif
+
                     </ul>
                 </div>
             </div>

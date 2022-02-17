@@ -42,25 +42,15 @@ class TaskController extends Controller{
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        //
+    public function edit($id){
+        return view('tasks.edit_task',[
+            'task'=> Task::find($id)
+        ]);
     }
 
     /**
@@ -70,9 +60,21 @@ class TaskController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        //
+    public function update(Request $request, $id){
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:projects,name',
+        ]);
+
+        $task =Task::find($id);
+
+        $task->name = $request->name;
+        $task->finish = $request->finish;
+        $task->project_id = Session::get('current_id');
+
+        $task->save();
+
+        return redirect()->route('tasks',Session::get('current_id'));
+
     }
 
     /**

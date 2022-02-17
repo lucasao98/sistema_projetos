@@ -23,7 +23,6 @@ Route::prefix('site')->group(function (){
     Route::get('logout', [App\Http\Controllers\Site\LoginController::class, 'logout'])->name('logout');
     Route::get('admin', [App\Http\Controllers\Site\AdminController::class, 'index'])->name('admin');
     Route::get('user', [App\Http\Controllers\Site\UserController::class, 'index'])->name('user');
-
 });
 
 Route::prefix(('project'))->group(function(){
@@ -50,5 +49,7 @@ Route::prefix(('admin'))->group(function(){
 Route::prefix(('task'))->group(function(){
     Route::get('task', [App\Http\Controllers\Site\TaskController::class, 'create'])->name('task');
     Route::post('add/task', [App\Http\Controllers\Site\TaskController::class, 'store'])->name('create.task');
+    Route::get('/edit/{id}', [App\Http\Controllers\Site\TaskController::class, 'edit'])->name('edit.task');
+    Route::put('/update/{id}', [App\Http\Controllers\Site\TaskController::class, 'update'])->name('update.task');
     Route::delete('delete/task/{id}', [App\Http\Controllers\Site\TaskController::class, 'destroy'])->name('delete.task');
 });

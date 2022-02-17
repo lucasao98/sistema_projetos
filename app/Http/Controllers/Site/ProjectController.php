@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Task;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class ProjectController extends Controller{
@@ -19,7 +17,7 @@ class ProjectController extends Controller{
      */
     public function index(){
         return view('projects.table_projects',[
-            'projects' => Project::with('user')->get(),
+            'projects' => Project::with('user')->where('user_id',Session::get('id'))->get(),
         ]);
     }
 
@@ -105,12 +103,11 @@ class ProjectController extends Controller{
     public function showTasks($id){
         $project = Project::find($id);
 
-        Session::put('current_project_name',$project['name']);
-        Session::put('current_id',$project['name']);
+        Session::put('current_id',$project['id']);
 
         return view('projects.show_project',[
-            'project' => $project['name'],
-            'tasks' =>Task::all()
+            'tasks' =>Task::with('project')->where('project_id',$id)->get(),
+            'project_name' => $project['name'],
         ]);
     }
 }
