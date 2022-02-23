@@ -29,7 +29,7 @@ Route::prefix('admin')->group(function (){
 });
 
 Route::group([
-    'middleware' => 'authJwt',
+    'middleware' => 'authJwt:payload',
     'prefix' => 'users'
 ],function (){
     Route::get('/', [App\Http\Controllers\Api\UserController::class, 'index']);

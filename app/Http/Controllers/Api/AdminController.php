@@ -16,12 +16,21 @@ class AdminController extends Controller{
     public function index(){
         $users = User::all();
 
-        // var_dump(json_decode($pload)->user_id);
+        $data_users = [];
+
+        foreach($users as $user){
+            array_push($data_users,[
+                "name" => $user->name,
+                "email" => $user->email,
+                "bearer_token" => $this->generateToken($user->id),
+
+            ]);
+        }
 
         if($users == null){
             return response()->json(['Não existem usuários cadastrados']);
         }else{
-            return response()->json($users);
+            return response()->json($data_users);
         }
     }
 

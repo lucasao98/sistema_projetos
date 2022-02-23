@@ -19,19 +19,31 @@ class UserController extends Controller{
         $token = $request->bearerToken();
 
         /*
-            Divide o token em 3 partes, o header, o payload, e a sign.
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
         */
         $data_token = explode(".",$token);
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
 
-        // Descriptografa o payload
-        $payload = base64_decode($data_token[1]);
 
-        $user_id = json_decode($payload)->user_id;
+        $key = getenv('JWT_SECRET');
 
-        $projects = Project::where('user_id',$user_id)->get();
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
 
-        return response()->json($projects);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
+            $user_id = json_decode($payload)->user_id;
+
+            $projects = Project::where('user_id',$user_id)->get();
+
+            return response()->json($projects);
+        }else{
+            return response()->json(['Token is invalid'],403);
+        }
     }
 
     /**

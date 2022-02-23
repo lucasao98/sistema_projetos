@@ -19,17 +19,21 @@ class AuthJwt extends BaseMiddleware{
             $token = $request->bearerToken();
 
             if($token == null){
-                return response()->json(['status'=>'Authorization Token not found']);
+                return response()->json(['status'=>'Authorization Token not found'],400);
             }
 
-            $user = User::where('remember_token',$token)->first();
+            // $user = User::where('remember_token',$token)->first();
 
-            if($user){
-                if($token == $user->remember_token){
-                    return $next($request);
-                }
+            // if($user && $token == $user->remember_token){
+            //     return $next($request);
+            // }else{
+            //     return response()->json(['status'=>'Token is invalid'],403);
+            // }
+
+            if($token){
+                return $next($request);
             }else{
-                return response()->json(['status'=>'Token is invalid']);
+                return response()->json(['status'=>'Token is invalid'],403);
             }
     }
 }
