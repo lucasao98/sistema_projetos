@@ -68,29 +68,6 @@ class AdminController extends Controller{
         return $token;
     }
 
-    public function login(Request $request){
-        $validated = $request->validate([
-            'email' => 'required|email|max:50|exists:users,email',
-            'password' => 'required|min:8',
-        ]);
-
-        $credentials = request(['email', 'password']);
-
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $this->respondWithToken($token);
-    }
-
-    protected function respondWithToken($token){
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -98,7 +75,7 @@ class AdminController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        if($request->name == null && $request->email == null){
+        if($request->name == null && $request->email == null && $request->password == null){
             return response()->json('Campos em branco');
         }
 
@@ -146,9 +123,26 @@ class AdminController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        //
+    public function update(Request $request, $id){
+        if($request->name == null && $request->email == null && $request->password == null){
+            return response()->json('Campos em branco');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:users,name',
+            'email' => 'required|email|max:50|unique:users,email',
+            'password' => 'required|min:8',
+        ]);
+
+        $user = User::find($id);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+
+        $user->save();
+
+        return response()->json('Usuário alterado!');
     }
 
     /**
