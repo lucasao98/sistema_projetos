@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::prefix('admin')->group(function (){
-    Route::post('login', [App\Http\Controllers\Api\AdminController::class, 'login']);
     Route::get('/', [App\Http\Controllers\Api\AdminController::class, 'index']);
     Route::get('user/{id}',[App\Http\Controllers\Api\AdminController::class,'show']);
     Route::post('create/user',[App\Http\Controllers\Api\AdminController::class,'store']);
@@ -26,6 +25,7 @@ Route::prefix('admin')->group(function (){
     Route::put('cancelpermission/user/{id}',[App\Http\Controllers\Api\AdminController::class,'cancelPermission']);
     Route::put('admin/{id}',[App\Http\Controllers\Api\AdminController::class,'update']);
     Route::delete('delete/user/{id}',[App\Http\Controllers\Api\AdminController::class,'destroy']);
+    Route::middleware('authJwt')->get('projects/all',[App\Http\Controllers\Api\AdminController::class,'allProjects']);
 });
 
 Route::group([
@@ -36,7 +36,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => 'authJwt:payload',
+    'middleware' => 'authJwt',
     'prefix' => 'projects'
 ],function (){
     Route::get('/', [App\Http\Controllers\Api\ProjectsController::class, 'index']);
