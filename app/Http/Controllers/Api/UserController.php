@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
-use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\JWT;
 
 class UserController extends Controller{
     /**
@@ -34,19 +31,16 @@ class UserController extends Controller{
             return response()->json(['Token is invalid'],403);
         }
         $payload = base64_decode($data_token[1]);
-        $exp_sec = (json_decode($payload)->exp);
+        $exp = (json_decode($payload)->exp);
 
-        $time_exp = strtotime("12:00:00");;
+        $date_now = time();
 
-        $date_now = date('H:i:s');
-
-        var_dump($time_exp);
         // Recebe o header e o payload do $token e cria a sign.
         $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
         $sign = base64_encode($sign);
 
-        if($date_now >= $time_exp){
-            return response()->json(['status'=>'Token is Expired']);
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
         }
 
         // Se a sign criada for igual a contida no token, então é realizada a descriptografia.
@@ -55,9 +49,25 @@ class UserController extends Controller{
 
             $user_id = json_decode($payload)->user_id;
 
+            $data_user = [];
+
             $projects = Project::where('user_id',$user_id)->get();
 
-            return response()->json($projects);
+            foreach($projects as $project){
+                array_push($data_user,[
+                    'project_name' => $project->name,
+                    'start_date' => $project->start_date,
+                    'end_date' => $project->end_date,
+                    'tasks' => Task::where('project_id',$project->id)->get([
+                        'name',
+                        'finish',
+                        'created_at',
+                        'updated_at'
+                    ])
+                ]);
+            }
+
+            return response()->json($data_user);
         }else{
             return response()->json(['Token is invalid'],403);
         }

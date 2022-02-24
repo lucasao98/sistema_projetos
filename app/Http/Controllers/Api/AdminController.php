@@ -45,7 +45,7 @@ class AdminController extends Controller{
 
         // Payload - Content
         $payload = [
-            'exp' => 60,
+            'exp' => time() + 3600,
             'user_id' => $id
         ];
 

@@ -34,3 +34,10 @@ Route::group([
 ],function (){
     Route::get('/', [App\Http\Controllers\Api\UserController::class, 'index']);
 });
+
+Route::group([
+    'middleware' => 'authJwt:payload',
+    'prefix' => 'projects'
+],function (){
+    Route::get('/', [App\Http\Controllers\Api\ProjectsController::class, 'index']);
+});
