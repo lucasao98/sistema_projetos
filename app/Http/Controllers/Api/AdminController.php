@@ -124,21 +124,19 @@ class AdminController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id){
-        if($request->name == null && $request->email == null && $request->password == null){
+        if($request->name == null && $request->email == null){
             return response()->json('Campos em branco');
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:50|unique:users,name',
-            'email' => 'required|email|max:50|unique:users,email',
-            'password' => 'required|min:8',
+            'name' => 'required|string|max:50',
+            'email' => 'required|email|max:50',
         ]);
 
         $user = User::find($id);
 
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = Hash::make($request->password);
 
         $user->save();
 
