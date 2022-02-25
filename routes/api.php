@@ -29,15 +29,15 @@ Route::prefix('admin')->group(function (){
 });
 
 Route::group([
-    'middleware' => 'authJwt:payload',
+    'middleware' => 'authJwt',
     'prefix' => 'users'
 ],function (){
     Route::get('/', [App\Http\Controllers\Api\UserController::class, 'index']);
-});
-
-Route::group([
-    'middleware' => 'authJwt',
-    'prefix' => 'projects'
-],function (){
-    Route::get('/', [App\Http\Controllers\Api\ProjectsController::class, 'index']);
+    Route::get('tasks/project/{id}', [App\Http\Controllers\Api\TaskController::class, 'index']);
+    Route::post('createproject', [App\Http\Controllers\Api\ProjectController::class, 'store']);
+    Route::post('createtask/{id}', [App\Http\Controllers\Api\TaskController::class, 'store']);
+    Route::put('updateproject/{id}', [App\Http\Controllers\Api\ProjectController::class, 'update']);
+    Route::put('updatetask/{id}', [App\Http\Controllers\Api\TaskController::class, 'update']);
+    Route::delete('deleteproject/{id}', [App\Http\Controllers\Api\ProjectController::class, 'destroy']);
+    Route::delete('deletetask/{id}', [App\Http\Controllers\Api\TaskController::class, 'destroy']);
 });

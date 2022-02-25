@@ -83,15 +83,6 @@ class UserController extends Controller{
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id){
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -118,25 +109,5 @@ class UserController extends Controller{
 
         return response()->json('Usuário alterado com sucesso!');
 
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id){
-        if($id == null){
-            return response()->json('id inválido');
-        }
-
-        $user = User::find($id);
-
-        if($user != null){
-            $user->delete();
-        }else{
-            return response()->json('Usuário não encontrado!');
-        }
     }
 }
