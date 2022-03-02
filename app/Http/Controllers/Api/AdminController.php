@@ -75,25 +75,66 @@ class AdminController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        if($request->name == null && $request->email == null && $request->password == null){
-            return response()->json('Campos em branco');
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:50|unique:users,name',
-            'email' => 'required|email|max:50|unique:users,email',
-            'password' => 'required|min:8',
-        ]);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->superuser = 0;
+            $user_id = json_decode($payload)->user_id;
 
-        $user->save();
+            $user = User::find($user_id);
 
-        return response()->json('Usuário cadastrado com sucesso!');
+            if($user->superuser == 1){
+                if($request->name == null && $request->email == null && $request->password == null){
+                    return response()->json('Campos em branco');
+                }
+
+                $validated = $request->validate([
+                    'name' => 'required|string|max:50|unique:users,name',
+                    'email' => 'required|email|max:50|unique:users,email',
+                    'password' => 'required|min:8',
+                ]);
+
+                $user = new User();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->password = Hash::make($request->password);
+                $user->superuser = 0;
+
+                $user->save();
+
+                return response()->json('Usuário cadastrado com sucesso!');
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+
+        }else{
+            return response()->json(['Token is invalid'],403);
+        }
     }
 
     /**
@@ -102,17 +143,52 @@ class AdminController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id){
+    public function show(Request $request,$id){
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
+        }
+
         if($id == null){
             return response()->json('id inválido');
         }
 
-        $user = User::find($id);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        if($user != null){
-            return response()->json($user);
+            $user_id = json_decode($payload)->user_id;
+
+            $user = User::find($user_id);
+
+            if($user->superuser == 1){
+                return response()->json($user);
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+
         }else{
-            return response()->json('Usuário não encontrado!');
+            return response()->json(['Token is invalid'],403);
         }
     }
 
@@ -124,23 +200,66 @@ class AdminController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id){
-        if($request->name == null && $request->email == null){
-            return response()->json('Campos em branco');
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:50',
-            'email' => 'required|email|max:50',
-        ]);
+        if($id == null){
+            return response()->json('id inválido');
+        }
 
-        $user = User::find($id);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+            $user_id = json_decode($payload)->user_id;
 
-        $user->save();
+            $user = User::find($user_id);
 
-        return response()->json('Usuário alterado!');
+            if($user->superuser == 1){
+                if($request->name == null && $request->email == null){
+                    return response()->json('Campos em branco');
+                }
+
+                $validated = $request->validate([
+                    'name' => 'required|string|max:50',
+                    'email' => 'required|email|max:50',
+                ]);
+
+                $user->name = $request->name;
+                $user->email = $request->email;
+
+                $user->save();
+
+                return response()->json('Usuário alterado!');
+
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+        }else{
+            return response()->json(['Token is invalid'],403);
+        }
     }
 
     /**
@@ -149,46 +268,157 @@ class AdminController extends Controller{
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id){
+    public function destroy(Request $request,$id){
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
+        }
+
         if($id == null){
             return response()->json('id inválido');
         }
 
-        $user = User::find($id);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        if($user != null){
-            $user->delete();
-            return response()->json('Usuário deletado!');
+            $user_id = json_decode($payload)->user_id;
+
+            $user = User::find($user_id);
+
+            if($user->superuser == 1){
+                $user->delete();
+                return response()->json('Usuário deletado!');
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+
         }else{
-            return response()->json('Usuário não encontrado!');
+            return response()->json(['Token is invalid'],403);
         }
     }
 
-    public function givePermission($id){
+    public function givePermission(Request $request,$id){
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
+        }
+
         if($id == null){
             return response()->json('id inválido');
         }
 
-        $user = User::find($id);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        if($user){
-            $user->update(['superuser'=> 1]);
+            $user_id = json_decode($payload)->user_id;
 
-            return response()->json('Usuário promovido para admin!');
+            $user = User::find($user_id);
+
+            if($user->superuser == 1){
+                $user->update(['superuser'=> 1]);
+
+                return response()->json('Usuário promovido para admin!');
+
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+
+        }else{
+            return response()->json(['Token is invalid'],403);
         }
     }
 
-    public function cancelPermission($id){
+    public function cancelPermission(Request $request,$id){
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
+        }
+
         if($id == null){
             return response()->json('id inválido');
         }
 
-        $user = User::find($id);
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
 
-        if($user){
-            $user->update(['superuser'=> 0]);
+            $user_id = json_decode($payload)->user_id;
 
-            return response()->json('Usuário promovido para admin!');
+            $user = User::find($user_id);
+
+            if($user->superuser == 1){
+                $user->update(['superuser'=> 0]);
+
+                return response()->json('Permissão removida!');
+
+            }else{
+                return response()->json(['Unauthorized!'],401);
+            }
+
+        }else{
+            return response()->json(['Token is invalid'],403);
         }
     }
 
@@ -224,26 +454,33 @@ class AdminController extends Controller{
 
             $user_id = json_decode($payload)->user_id;
 
-            $data_user = [];
+            $user = User::find($user_id);
 
-            $projects = Project::where('user_id',$user_id)->get();
+            if($user->superuser == 1){
+                $data_user = [];
 
-            foreach($projects as $project){
-                array_push($data_user,[
-                    'project_name' => $project->name,
-                    'start_date' => $project->start_date,
-                    'end_date' => $project->end_date,
-                    'owner' => User::where('id',$user_id)->first()->name,
-                    'tasks' => Task::where('project_id',$project->id)->get([
-                        'name',
-                        'finish',
-                        'created_at',
-                        'updated_at'
-                    ])
-                ]);
+                $projects = Project::where('user_id',$user_id)->get();
+
+                foreach($projects as $project){
+                    array_push($data_user,[
+                        'project_name' => $project->name,
+                        'start_date' => $project->start_date,
+                        'end_date' => $project->end_date,
+                        'owner' => User::where('id',$user_id)->first()->name,
+                        'tasks' => Task::where('project_id',$project->id)->get([
+                            'name',
+                            'finish',
+                            'created_at',
+                            'updated_at'
+                        ])
+                    ]);
+                }
+
+                return response()->json($data_user);
+            }else{
+                return response()->json(['Unauthorized!'],401);
             }
 
-            return response()->json($data_user);
         }else{
             return response()->json(['Token is invalid'],403);
         }
