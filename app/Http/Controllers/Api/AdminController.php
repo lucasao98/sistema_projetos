@@ -179,9 +179,11 @@ class AdminController extends Controller{
 
             $user_id = json_decode($payload)->user_id;
 
-            $user = User::find($user_id);
+            $user = User::find($id);
 
-            if($user->superuser == 1){
+            $isadmin = User::find($user_id)->superuser;
+
+            if($isadmin == 1){
                 return response()->json($user);
             }else{
                 return response()->json(['Unauthorized!'],401);
@@ -304,9 +306,11 @@ class AdminController extends Controller{
 
             $user_id = json_decode($payload)->user_id;
 
-            $user = User::find($user_id);
+            $user = User::find($id);
 
-            if($user->superuser == 1){
+            $isadmin = User::find($user_id)->superuser;
+
+            if($isadmin == 1){
                 $user->delete();
                 return response()->json('Usuário deletado!');
             }else{

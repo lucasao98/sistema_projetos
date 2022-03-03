@@ -33,6 +33,7 @@ Route::group([
     'prefix' => 'users'
 ],function (){
     Route::get('/', [App\Http\Controllers\Api\UserController::class, 'index']);
+    Route::get('projects', [App\Http\Controllers\Api\ProjectController::class, 'index']);
     Route::get('tasks/project/{id}', [App\Http\Controllers\Api\TaskController::class, 'index']);
     Route::post('createproject', [App\Http\Controllers\Api\ProjectController::class, 'store']);
     Route::post('createtask/{id}', [App\Http\Controllers\Api\TaskController::class, 'store']);

@@ -7,6 +7,47 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller{
+    public function index(Request $request){
+        // Recebe o token do middleware
+        $token = $request->bearerToken();
+        $key = getenv('JWT_SECRET');
+
+        /*
+            Verifica se o token está no padrão correto, sendo header.payload.sign
+            Caso o token não tenha essa estrutura, o token está inválido.
+        */
+
+        $data_token = explode(".",$token);
+
+        if(count($data_token) < 3){
+            return response()->json(['Token is invalid'],403);
+        }
+        $payload = base64_decode($data_token[1]);
+        $exp = (json_decode($payload)->exp);
+
+        $date_now = time();
+
+        // Recebe o header e o payload do $token e cria a sign.
+        $sign = hash_hmac('sha256',$data_token[0] . "." . $data_token[1],$key,true);
+        $sign = base64_encode($sign);
+
+        if($date_now >= $exp){
+            return response()->json(['status'=>'Token is Expired'],403);
+        }
+
+        // Se a sign criada for igual a contida no token, então é realizada a descriptografia.
+        if($data_token[2] == $sign){
+            $payload = base64_decode($data_token[1]);
+
+            $user_id = json_decode($payload)->user_id;
+
+            $projects = Project::where('user_id',$user_id)->get();
+
+            return response()->json($projects);
+        }else{
+            return response()->json(['Token is invalid'],403);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *
